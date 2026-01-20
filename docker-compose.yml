@@ -12,6 +12,13 @@ services:
       - ./postgres-init:/docker-entrypoint-initdb.d
     networks:
       - secure-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-admin}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   opa:
     image: openpolicyagent/opa:latest
@@ -27,6 +34,7 @@ services:
       - "/etc/opa/policy.rego"
     networks:
       - secure-net
+    restart: unless-stopped
 
   nexus-auth:
     image: quay.io/keycloak/keycloak:24.0.0
@@ -41,15 +49,17 @@ services:
       KC_HOSTNAME_STRICT: "false"
     ports:
       - "8888:8080"
-    command: 
+    command:
       - "start-dev"
       - "--import-realm"
     volumes:
       - ./keycloak-realm:/opt/keycloak/data/import
     networks:
       - secure-net
+    restart: unless-stopped
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   redis:
     image: redis:7-alpine
@@ -58,6 +68,7 @@ services:
       - "6379:6379"
     networks:
       - secure-net
+    restart: unless-stopped
 
   tenantcore:
     build:
@@ -73,6 +84,7 @@ services:
       - redis
     networks:
       - secure-net
+    restart: unless-stopped
 
   product-service:
     build:
@@ -83,10 +95,13 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
-      - postgres
-      - nexus-auth
+      postgres:
+        condition: service_healthy
+      nexus-auth:
+        condition: service_started
     networks:
       - secure-net
+    restart: unless-stopped
 
 networks:
   secure-net:
