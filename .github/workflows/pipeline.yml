@@ -9,6 +9,8 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
 
     services:
       postgres:
@@ -44,10 +46,10 @@ jobs:
       run: opa test ./opa -v
 
     - name: Build and Test TenantCore
-      run: mvn -f tenantcore/pom.xml clean install -DskipTests
+      run: mvn -f tenantcore/pom.xml clean verify
 
     - name: Build and Test Product Service
-      run: mvn -f services/product-service/pom.xml clean install -DskipTests
+      run: mvn -f services/product-service/pom.xml clean verify
 
     - name: Docker Build Check (TenantCore)
       run: docker build ./tenantcore -t tenantcore:latest
@@ -56,4 +58,4 @@ jobs:
       run: docker build ./services/product-service -t tenantcore-product:latest
 
     - name: Final Integrity Check
-      run: echo "🎉 Build e Validação de Segurança Concluídos com Sucesso!"
+      run: echo "Build e Validação de Segurança Concluídos com Sucesso!"
