@@ -9,12 +9,9 @@ default allow := false
 allow if {
     # O usuário pertence ao Tenant correto (Isolamento)
     input.user.tenant_id == input.resource.tenant_id
-    
+
     # O método HTTP é permitido para a Role do usuário
     user_has_permission
-    
-    # Proteção de Horário: Apenas entre 08:00 e 20:00 (Opcional, mas especialista)
-    is_working_hours
 }
 
 # Verificação de Permissões (RBAC)
