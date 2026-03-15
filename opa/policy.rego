@@ -24,13 +24,6 @@ user_has_permission if {
     input.request.method == "GET" # User só lê
 }
 
-# Verificação de Horário (ABAC)
-is_working_hours if {
-    hour := time.date(time.now_ns())[3]
-    hour >= 8
-    hour <= 20
-}
-
 # Detalhes da negação (útil para auditoria)
 reason := "Acesso negado: Inconsistência de Tenant ou Horário não permitido." if {
     not allow
