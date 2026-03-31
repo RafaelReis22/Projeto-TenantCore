@@ -1,0 +1,93 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: nexus-db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: multi_tenant_db
+    ports:
+      - "5444:5432"
+    volumes:
+      - ./postgres-init:/docker-entrypoint-initdb.d
+    networks:
+      - secure-net
+
+  opa:
+    image: openpolicyagent/opa:latest
+    container_name: nexus-opa
+    ports:
+      - "8181:8181"
+    volumes:
+      - ./opa:/etc/opa
+    command:
+      - "run"
+      - "--server"
+      - "--log-level=debug"
+      - "/etc/opa/policy.rego"
+    networks:
+      - secure-net
+
+  nexus-auth:
+    image: quay.io/keycloak/keycloak:24.0.0
+    container_name: nexus-auth
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/multi_tenant_db
+      KC_DB_USERNAME: admin
+      KC_DB_PASSWORD: password
+      KC_HOSTNAME_STRICT: "false"
+    ports:
+      - "8888:8080"
+    command: 
+      - "start-dev"
+      - "--import-realm"
+    volumes:
+      - ./keycloak-realm:/opt/keycloak/data/import
+    networks:
+      - secure-net
+    depends_on:
+      - postgres
+
+  redis:
+    image: redis:7-alpine
+    container_name: nexus-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - secure-net
+
+  gateway:
+    build:
+      context: ./gateway
+    container_name: nexus-gateway
+    ports:
+      - "9000:9000"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - nexus-auth
+      - opa
+      - redis
+    networks:
+      - secure-net
+
+  product-service:
+    build:
+      context: ./services/product-service
+    container_name: nexus-product
+    ports:
+      - "9001:9001"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - postgres
+      - nexus-auth
+    networks:
+      - secure-net
+
+networks:
+  secure-net:
+    driver: bridge

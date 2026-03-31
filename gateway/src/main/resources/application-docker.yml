@@ -1,0 +1,26 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: product-service
+          uri: http://nexus-product:9001
+          predicates:
+            - Path=/api/products/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                key-resolver: "#{@tenantKeyResolver}"
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8888/realms/MultiTenantSaaS
+          jwk-set-uri: http://nexus-auth:8080/realms/MultiTenantSaaS/protocol/openid-connect/certs
+
+  data:
+    redis:
+      host: nexus-redis
+      port: 6379
