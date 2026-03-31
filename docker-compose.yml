@@ -59,10 +59,10 @@ services:
     networks:
       - secure-net
 
-  gateway:
+  tenantcore:
     build:
-      context: ./gateway
-    container_name: nexus-gateway
+      context: ./tenantcore
+    container_name: nexus-tenantcore
     ports:
       - "9000:9000"
     environment:

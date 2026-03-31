@@ -1,7 +1,7 @@
-# 🛡️ Projeto Argus Gateway
+# 🛡️ Projeto TenantCore
 ## Enterprise Multi-tenant Cloud Infrastructure
 
-![Logo](argus_gateway_logo_1774929525375.png)
+![Logo](tenantcore_logo.png)
 
 *The unblinking sentinel of your microservices ecosystem.*
 
@@ -13,7 +13,7 @@
 
 ## 🔍 Visão Geral
 
-O **ARGUS Gateway** é uma infraestrutura de segurança distribuída projetada para aplicações SaaS modernas que exigem isolamento crítico de dados. Ele não apenas controla quem entra, mas garante que **nenhum dado vaze entre clientes (Tenants)** nas camadas mais profundas do sistema.
+O **TenantCore** é uma infraestrutura de segurança distribuída projetada para aplicações SaaS modernas que exigem isolamento crítico de dados. Ele não apenas controla quem entra, mas garante que **nenhum dado vaze entre clientes (Tenants)** nas camadas mais profundas do sistema.
 
 ### 🏆 Diferenciais de Especialista
 
@@ -31,11 +31,11 @@ graph TD
     classDef secure stroke:#00ffff,stroke-width:2px;
     classDef actor fill:#222,stroke:#fff,color:#fff;
 
-    User((User)):::actor -->|JWT Request| Gateway[ARGUS Gateway]:::secure
-    Gateway -->|1. Auth Check| Keycloak[Keycloak IAM]
-    Gateway -->|2. Authorize?| OPA[Open Policy Agent]:::secure
-    OPA -->|Allow/Deny| Gateway
-    Gateway -->|3. Forward| ProductService[Product Service]
+    User((User)):::actor -->|JWT Request| TenantCore[TenantCore]:::secure
+    TenantCore -->|1. Auth Check| Keycloak[Keycloak IAM]
+    TenantCore -->|2. Authorize?| OPA[Open Policy Agent]:::secure
+    OPA -->|Allow/Deny| TenantCore
+    TenantCore -->|3. Forward| ProductService[Product Service]
     ProductService -->|4. Set Session| Postgres[(PostgreSQL Vault)]:::secure
     Postgres -->|RLS Enforcement| RowLevel[Row Level Security]
 ```
@@ -59,7 +59,7 @@ graph TD
 
 A maioria dos sistemas tenta isolar dados no código Java (`WHERE tenant_id = ?`). Isso é fatal se um desenvolvedor esquecer o filtro em uma nova query.
 
-No **ARGUS Gateway**, usamos **Row-Level Security (RLS)**:
+No **TenantCore**, usamos **Row-Level Security (RLS)**:
 
 - **Segurança Garantida:** O banco de dados bloqueia o acesso mesmo se o código falhar.
 - **Eficiência:** O isolamento acontece na camada mais profunda da persistência.
@@ -81,7 +81,7 @@ Basta um comando para subir todo o ecossistema pronto para ser testado:
 
 ```bash
 # Clone e entre na pasta do projeto
-# Suba todo o ecossistema (Gateway, Auth, DB, OPA)
+# Suba todo o ecossistema (TenantCore, Auth, DB, OPA)
 docker compose up -d --build
 ```
 
@@ -92,7 +92,7 @@ docker compose up -d --build
 | Camada | Tecnologia | Ícone |
 | :--- | :--- | :--- |
 | **Backend** | Java 21, Spring Boot 3.2 | ![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white) |
-| **Gateway** | Spring Cloud Gateway | ![Spring](https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=spring&logoColor=white) |
+| **Borda** | Spring Cloud Gateway | ![Spring](https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=spring&logoColor=white) |
 | **Segurança** | Keycloak 24 & OPA | ![Keycloak](https://img.shields.io/badge/Keycloak-A10000?style=for-the-badge&logo=keycloak&logoColor=white) |
 | **Database** | PostgreSQL 16 (RLS) | ![Postgres](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white) |
 | **Cache** | Redis 7 | ![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white) |
@@ -101,10 +101,10 @@ docker compose up -d --build
 
 ## 🔒 Security Showcase
 O diferencial deste projeto é a **Defesa em Profundidade**. Você pode testar o isolamento tentando acessar dados de um Tenant A com um Token do Tenant B. O sistema bloqueará a requisição em **três níveis**:
-1. **Gateway:** O filtro OPA valida o `tenant_id` no JWT.
+1. **TenantCore:** O filtro OPA valida o `tenant_id` no JWT.
 2. **Service:** O `TenantFilter` isola o contexto da thread.
 3. **Banco de Dados:** O **RLS** garante que a query só retorne o que pertence ao Tenant logado.
 
 ---
 
-Mantido com 🛡️ pela equipe **ARGUS Sentinel**.
+Mantido com 🛡️ pela equipe **TenantCore Architects**.

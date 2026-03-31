@@ -18,7 +18,7 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("ARGUS Product Service API")
+                        .title("TenantCore Product Service API")
                         .version("1.0")
                         .description("API protegida por OPA e Row-Level Security (RLS)"))
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))

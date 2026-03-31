@@ -1,4 +1,4 @@
-package com.nexus.gateway;
+package com.nexus.tenantcore;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,10 +9,10 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import reactor.core.publisher.Mono;
 
 @SpringBootApplication
-public class GatewayApplication {
+public class TenantCoreApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(GatewayApplication.class, args);
+        SpringApplication.run(TenantCoreApplication.class, args);
     }
 
     @Bean

@@ -1,4 +1,4 @@
-package com.nexus.gateway.filter;
+package com.nexus.tenantcore.filter;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.slf4j.Logger;
@@ -16,12 +16,12 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 
 @Component
-public class OpaGatewayFilter extends AbstractGatewayFilterFactory<OpaGatewayFilter.Config> {
+public class OpaTenantCoreFilter extends AbstractGatewayFilterFactory<OpaTenantCoreFilter.Config> {
 
-    private static final Logger logger = LoggerFactory.getLogger(OpaGatewayFilter.class);
+    private static final Logger logger = LoggerFactory.getLogger(OpaTenantCoreFilter.class);
     private final WebClient webClient;
 
-    public OpaGatewayFilter(WebClient.Builder webClientBuilder) {
+    public OpaTenantCoreFilter(WebClient.Builder webClientBuilder) {
         super(Config.class);
         this.webClient = webClientBuilder.baseUrl("http://nexus-opa:8181").build();
     }
